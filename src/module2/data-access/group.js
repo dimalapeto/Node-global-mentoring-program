@@ -23,7 +23,7 @@ export default class GroupService {
   }
 
   async findAll() {
-    const groups = await this.GroupModel.findAll();
+    const groups = await this.GroupModel.findAll({ include: ['users'] });
     return groups;
   }
 

@@ -26,6 +26,7 @@ import { defineModels } from '../models/defineModels.js';
       name: 'General',
       permissions: ['READ', 'SHARE', 'UPLOAD_FILES'],
     });
+    await createdUser.addGroup(createdGroup);
     console.log('User added:', createdUser.toJSON());
     console.log('Group added:', createdGroup.toJSON());
     process.exit(0);

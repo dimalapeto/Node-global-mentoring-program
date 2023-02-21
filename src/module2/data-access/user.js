@@ -26,6 +26,7 @@ export default class UserService {
 
   async getSuggestList(filter, limit) {
     const users = await this.UserModel.findAll({
+      include: ['groups'],
       where: {
         login: {
           [Op.substring]: filter,
