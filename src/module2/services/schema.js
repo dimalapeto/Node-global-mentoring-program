@@ -7,3 +7,11 @@ export const userSchema = Joi.object().keys({
   age: Joi.number().integer().min(4).max(130).required(),
   isDeleted: Joi.boolean().required(),
 });
+
+export const groupSchema = Joi.object().keys({
+  id: Joi.string(),
+  name: Joi.string().required(),
+  permissions: Joi.array()
+    .items('READ', 'WRITE', 'DELETE', 'SHARE', 'UPLOAD_FILES')
+    .required(),
+});
