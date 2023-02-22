@@ -5,10 +5,6 @@ class Group extends Model {}
 export const defineGroup = (sequelize) =>
   Group.init(
     {
-      id: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,

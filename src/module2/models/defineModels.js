@@ -5,7 +5,17 @@ export const defineModels = (sequelize) => {
   const User = defineUser(sequelize);
   const Group = defineGroup(sequelize);
 
-  User.belongsToMany(Group, { through: 'User_Group' });
-  Group.belongsToMany(User, { through: 'User_Group' });
+  const User_Group = sequelize.define('User_Group', {}, { timestamps: false });
+  User.belongsToMany(Group, {
+    through: User_Group,
+    as: 'groups',
+    onDelete: 'CASCADE',
+  });
+  Group.belongsToMany(User, {
+    through: User_Group,
+    as: 'users',
+    onDelete: 'CASCADE',
+  });
+
   return { User, Group };
 };

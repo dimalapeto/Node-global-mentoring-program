@@ -45,4 +45,17 @@ export const groupRouter = (app, service) => {
       res.status(404).json({ message: `Group with id ${groupId} not deleted` });
     }
   });
+
+  //add users to group
+  route.put('/:id/add-users', async (req, res) => {
+    const groupId = req.params.id;
+    const updatedGroup = await service.addUsersToGroup(groupId, req.body.users);
+
+    if (updatedGroup.isError) {
+      res
+        .status(404)
+        .json({ message: 'Something went wrong with adding users to group' });
+    }
+    res.status(201).json({ message: 'Users added to group succesfully' });
+  });
 };
