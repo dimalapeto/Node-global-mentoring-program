@@ -11,7 +11,7 @@ import { defineModels } from '../models/defineModels.js';
   }
   console.log('Connection has been established successfully.');
 
-  const { User } = defineModels(sequelize);
+  const { User, Group } = defineModels(sequelize);
 
   await sequelize.sync({ force: true });
 
@@ -22,7 +22,13 @@ import { defineModels } from '../models/defineModels.js';
       age: 35,
       isDeleted: false,
     });
+    const createdGroup = await Group.create({
+      name: 'General',
+      permissions: ['READ', 'SHARE', 'UPLOAD_FILES'],
+    });
+    await createdUser.addGroup(createdGroup);
     console.log('User added:', createdUser.toJSON());
+    console.log('Group added:', createdGroup.toJSON());
     process.exit(0);
   } catch (err) {
     console.error('Unable to create user:', err);
