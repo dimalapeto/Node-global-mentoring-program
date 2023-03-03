@@ -1,3 +1,6 @@
+import { logger } from '../services/logger.js';
+import { HttpCode } from '../constants.js';
+
 const errorResponse = (schemaErrors) => {
   const errors = schemaErrors.map((error) => {
     let { path, message } = error;
@@ -17,7 +20,10 @@ export const validateSchema = (schema) => {
     });
 
     if (error?.isJoi) {
-      res.status(400).json(errorResponse(error.details));
+      res.status(HttpCode.BAD_REQUEST).json(errorResponse(error.details));
+      logger.error(
+        `Request: ${req.method} '${req.url}'. Message: ${error.message}`
+      );
     } else {
       next();
     }

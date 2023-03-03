@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { validateSchema } from '../services/validator.js';
 import { userSchema } from '../services/schema.js';
+import { logger } from '../services/logger.js';
+import { HttpCode } from '../constants.js';
 
 export const userRouter = (app, service) => {
   const route = new Router();
@@ -10,8 +12,12 @@ export const userRouter = (app, service) => {
   route.get('/:id', async (req, res) => {
     const userId = req.params.id;
     const user = await service.findUserById(userId);
-    if (user === undefined) {
-      res.status(404).json({ message: `User with id ${userId} not found` });
+    if (user === null) {
+      const message = `User with id ${userId} not found`;
+      res.status(HttpCode.NOT_FOUND).json({ message });
+      logger.error(
+        `Request: ${req.method} 'users${req.url}'. Message: ${message}`
+      );
     } else {
       res.json(user);
     }
@@ -19,29 +25,68 @@ export const userRouter = (app, service) => {
 
   //Add user
   route.post('/', validateSchema(userSchema), async (req, res) => {
-    const createdUser = await service.create(req.body);
-    res.status(201).json(createdUser);
+    try {
+      const createdUser = await service.create(req.body);
+      res.status(HttpCode.CREATED).json(createdUser);
+    } catch (error) {
+      res.status(HttpCode.BAD_REQUEST).json({
+        message: error.message,
+      });
+      logger.error(
+        `Request: ${req.method} 'users${req.url}'. Message: ${error.message}`
+      );
+    }
   });
 
   //Update user
   route.put('/', validateSchema(userSchema), async (req, res) => {
-    const updatedUser = await service.update(req.body);
-    res.status(201).json({ message: `User update status: ${updatedUser}` });
+    try {
+      const updatedUser = await service.update(req.body);
+      res
+        .status(HttpCode.OK)
+        .json({ message: `User update status: ${updatedUser}` });
+    } catch (error) {
+      res.status(HttpCode.BAD_REQUEST).json({
+        message: error.message,
+      });
+      logger.error(
+        `Request: ${req.method} 'users${req.url}'. Message: ${error.message}`
+      );
+    }
   });
 
   //Get suggest-list - users?filter=<string>&limit=number
   route.get('/', async (req, res) => {
     const { filter, limit } = req.query;
-    const list = await service.getSuggestList(filter, limit);
-    res.status(201).json(list);
+    try {
+      const list = await service.getSuggestList(filter, limit);
+      res.status(HttpCode.OK).json(list);
+    } catch (error) {
+      res.status(HttpCode.BAD_REQUEST).json({
+        message: error.message,
+      });
+      logger.error(
+        `Request: ${req.method} 'users${req.url}'. Message: ${error.message}`
+      );
+    }
   });
 
   // Soft delete user
   route.delete('/:id', async (req, res) => {
     const userId = req.params.id;
-    const deletedUser = await service.delete(userId);
-    res.status(201).json({
-      message: `Field isDeleted for User with id ${userId} set as ${deletedUser}`,
-    });
+
+    try {
+      const deletedUser = await service.delete(userId);
+      res.status(HttpCode.OK).json({
+        message: `Field isDeleted for User with id ${userId} set as ${deletedUser}`,
+      });
+    } catch (error) {
+      res.status(HttpCode.BAD_REQUEST).json({
+        message: error.message,
+      });
+      logger.error(
+        `Request: ${req.method} 'users${req.url}'. Message: ${error.message}`
+      );
+    }
   });
 };
