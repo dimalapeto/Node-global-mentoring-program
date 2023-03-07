@@ -1,15 +1,16 @@
 import { sequelize } from './sequelize.js';
 import { defineModels } from '../models/defineModels.js';
+import { logger } from '../services/logger.js';
 
 (async () => {
   try {
-    console.log(`Trying to connect to database...`);
+    logger.info(`Trying to connect to database...`);
     await sequelize.authenticate();
   } catch (err) {
-    console.error('Unable to connect to the database:', err);
+    logger.error(`Unable to connect to the database: ${err.message}`);
     process.exit(1);
   }
-  console.log('Connection has been established successfully.');
+  logger.info(`The connection to database is established`);
 
   const { User, Group } = defineModels(sequelize);
 
@@ -27,11 +28,11 @@ import { defineModels } from '../models/defineModels.js';
       permissions: ['READ', 'SHARE', 'UPLOAD_FILES'],
     });
     await createdUser.addGroup(createdGroup);
-    console.log('User added:', createdUser.toJSON());
-    console.log('Group added:', createdGroup.toJSON());
+    logger.info(`User added: ${JSON.stringify(createdUser.toJSON())}`);
+    logger.info(`Group added: ${JSON.stringify(createdGroup.toJSON())}`);
     process.exit(0);
   } catch (err) {
-    console.error('Unable to create user:', err);
+    logger.error(`Unable to create user: ${err.message}`);
     process.exit(1);
   }
 })();

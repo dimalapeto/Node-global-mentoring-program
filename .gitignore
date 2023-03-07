@@ -2,3 +2,4 @@
 node_modules/
 convertedFile.txt
 .env
+logs/
